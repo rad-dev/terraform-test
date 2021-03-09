@@ -1,4 +1,5 @@
-# Learn Terraform - Provision an EKS Cluster
+# EKS deployment using Terraform and Ansible
 
-This repo is a companion repo to the [Provision an EKS Cluster learn guide](https://learn.hashicorp.com/terraform/kubernetes/provision-eks-cluster), containing
-Terraform configuration files to provision an EKS cluster on AWS.
+*This repository contains terraform files and ansible playbooks to deploy a highly-available EKS cluster with some apps deployed.*
+
+## Terraform

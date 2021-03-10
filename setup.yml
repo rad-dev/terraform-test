@@ -1,20 +1,32 @@
 ---
 
-- name: "Setup Kubectl Environment"
+- name: Setup Kubectl Environment
   hosts: localhost
   run_once: true
   tasks:
 
-    - name: "Get EKS Cluster region"
+    - name: Get EKS Cluster region
       command: "terraform output -raw region"
       register: region
 
-    - name: "Get EKS cluster name"
+    - name: Get EKS cluster name
       command: "terraform output -raw cluster_name"
       register: cluster_name
 
-    - name: "Set kubernetes environment"
-      command: "aws eks --region {{ region.stdout }} update-kubeconfig --name {{  cluster_name.stdout }}"
-    
+    - name: Get kube config status
+      stat:
+        path: "{{ ansible_env.HOME }}/.kube/config"
+      register: config_status
 
-        
+    - name: Display config status
+      debug:
+        msg: "Config status = {{ config_status.stat.exists }}"
+    
+    - name: Delete kube config
+      file:
+        state: absent
+        path: "{{ ansible_env.HOME }}/.kube/config"
+      when: config_status.stat.exists
+
+    - name: Set kubernetes environment
+      command: "aws eks --region {{ region.stdout }} update-kubeconfig --name {{  cluster_name.stdout }}"

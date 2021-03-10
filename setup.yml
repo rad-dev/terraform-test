@@ -30,3 +30,7 @@
 
     - name: Set kubernetes environment
       command: "aws eks --region {{ region.stdout }} update-kubeconfig --name {{  cluster_name.stdout }}"
+    
+    - name: Install community.kubernetes on host machine
+      command: "ansible-galaxy collection install community.kubernetes"
+      run_once: true

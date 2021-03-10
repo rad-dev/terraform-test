@@ -1,0 +1,4 @@
+---
+
+- import_playbook: ./namespace/namespace.yml
+- import_playbook: ./app/deploy_apps.yml

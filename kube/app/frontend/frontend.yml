@@ -1,0 +1,10 @@
+---
+
+- name: Deploy frontend apps
+  hosts: localhost
+  tasks:
+    - name: Deploy Nginx
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ./nginx/nginx-dep.yml

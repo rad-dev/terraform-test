@@ -23,7 +23,7 @@ module "eks" {
       additional_userdata           = "echo storage group for storage tasks e.g. databases"
       asg_desired_capacity          = 1
       additional_security_group_ids = [aws_security_group.worker_storage_group_mgmt.id]
-      kubelet_extra_args            = "--node-labels=storage --register-with-taints=storage:NoSchedule"  
+      kubelet_extra_args            = "--node-labels=hosttype=storage"  
     },
     {
       name                          = "worker-cpu-group"
@@ -31,7 +31,7 @@ module "eks" {
       additional_userdata           = "echo cpu group for cpu-intensive tasks"
       additional_security_group_ids = [aws_security_group.worker_cpu_group_mgmt.id]
       asg_desired_capacity          = 1
-      kubelet_extra_args            = "--node-labels=cpu --register-with-taints=cpu:NoSchedule"  
+      kubelet_extra_args            = "--node-labels=hosttype=cpu"  
     },
     {
       name                          = "worker-gpu-group"
@@ -39,7 +39,7 @@ module "eks" {
       additional_userdata           = "echo gpu group for gpu-intensive tasks"
       additional_security_group_ids = [aws_security_group.worker_gpu_group_mgmt.id]
       asg_desired_capacity          = 1
-      kubelet_extra_args            = "--node-labels=gpu --register-with-taints=gpu:NoSchedule"  
+      kubelet_extra_args            = "--node-labels=hosttype=gpu"  
     },
   ]
 }

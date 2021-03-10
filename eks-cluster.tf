@@ -21,7 +21,7 @@ module "eks" {
       name                          = "worker-storage-group"
       instance_type                 = "t2.small"
       additional_userdata           = "echo storage group for storage tasks e.g. databases"
-      asg_desired_capacity          = 2
+      asg_desired_capacity          = 1
       additional_security_group_ids = [aws_security_group.worker_storage_group_mgmt.id]
     },
     {

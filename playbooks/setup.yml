@@ -1,0 +1,13 @@
+---
+
+- name: "Setup Kubectl Environment"
+  hosts: localhost
+  tasks:
+
+    - name: "Get EKS Cluster region"
+      command: "terraform output -raw region"
+      register: region
+
+    - name: "Print cluster region"
+      debug:
+        msg: "The cluster region is {{ region.stdout }}."

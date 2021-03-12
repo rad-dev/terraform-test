@@ -3,8 +3,40 @@
 - name: Deploy frontend apps
   hosts: localhost
   tasks:
-    - name: Deploy Nginx
+    - name: Fetch nginx deployment status
+      set_fact:
+        deployments: "{{ lookup('community.kubernetes.k8s', kind='Deployment', namespace='testing', resource_name='nginx-dep') }}"
+
+    - name: Fetch nginx deployment status
+      set_fact:
+        service: "{{ lookup('community.kubernetes.k8s', kind='Service', namespace='testing', resource_name='nginx-svc') }}"
+    
+    - name: Delete nginx deployment if it exists
+      community.kubernetes.k8s:
+        namespace: testing
+        state: absent
+        kind: Deployment
+        name: nginx-dep
+      when: deployments.status.availableReplicas >=1 or deployments.status.readyReplicas >= 1
+      ignore_errors: yes
+      
+    - name: Delete nginx service if it exists
+      community.kubernetes.k8s:
+        namespace: testing
+        state: absent
+        kind: Deployment
+        name: nginx-svc
+      when: service.keys()| length > 0
+      ignore_errors: yes
+
+    - name: Deploy nginx deployment
       community.kubernetes.k8s:
         namespace: testing
         state: present
         src: ./nginx/nginx-dep.yml
+
+    - name: Deploy nginx service
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ./nginx/nginx-svc.yml

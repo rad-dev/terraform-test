@@ -28,7 +28,7 @@ module "eks" {
     {
       name                          = "worker-cpu-group"
       instance_type                 = "t2.small"
-      additional_userdata           = "echo cpu group for cpu-intensive tasks"
+      additional_userdata           = "echo gpu group for cpu-intensive tasks"
       additional_security_group_ids = [aws_security_group.worker_cpu_group_mgmt.id]
       asg_desired_capacity          = 1
       kubelet_extra_args            = "--node-labels=hosttype=cpu"  
@@ -36,7 +36,13 @@ module "eks" {
     {
       name                          = "worker-gpu-group"
       instance_type                 = "t2.small"
-      additional_userdata           = "echo gpu group for gpu-intensive tasks"
+      additional_userdata           = <<EOT
+                distribution=$(. /etc/os-release;echo $ID$VERSION_ID) && \
+                curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - && \
+                curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list && \
+                sudo apt-get update && sudo apt-get install -y nvidia-docker2 && \
+                sudo systemctl restart docker
+                EOT
       additional_security_group_ids = [aws_security_group.worker_gpu_group_mgmt.id]
       asg_desired_capacity          = 1
       kubelet_extra_args            = "--node-labels=hosttype=gpu"  

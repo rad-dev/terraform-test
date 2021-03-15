@@ -3,40 +3,46 @@
 - name: Deploy frontend apps
   hosts: localhost
   tasks:
-    - name: Fetch nginx deployment status
+    - name: Fetch kibana deployment status
       set_fact:
-        deployments: "{{ lookup('community.kubernetes.k8s', kind='Deployment', namespace='testing', resource_name='nginx-dep') }}"
+        deployments: "{{ lookup('community.kubernetes.k8s', kind='Deployment', namespace='testing', resource_name='kibana') }}"
 
-    - name: Fetch nginx deployment status
+    - name: Fetch kibana deployment status
       set_fact:
-        service: "{{ lookup('community.kubernetes.k8s', kind='Service', namespace='testing', resource_name='nginx-svc') }}"
+        service: "{{ lookup('community.kubernetes.k8s', kind='Service', namespace='testing', resource_name='kibana-svc') }}"
     
-    - name: Delete nginx deployment if it exists
+    - name: Delete kibana deployment if it exists
       community.kubernetes.k8s:
         namespace: testing
         state: absent
         kind: Deployment
-        name: nginx-dep
+        name: kibana
       when: deployments.status.availableReplicas >=1 or deployments.status.readyReplicas >= 1
       ignore_errors: yes
       
-    - name: Delete nginx service if it exists
+    - name: Delete kibana service if it exists
       community.kubernetes.k8s:
         namespace: testing
         state: absent
         kind: Deployment
-        name: nginx-svc
-      when: service.keys()| length > 0
+        name: kibana
+      when: service | length > 0
       ignore_errors: yes
 
-    - name: Deploy nginx deployment
+    - name: Deploy kibana deployment
       community.kubernetes.k8s:
         namespace: testing
         state: present
-        src: ./nginx/nginx-dep.yml
+        src: ./kibana/kibana_dep.yml
 
-    - name: Deploy nginx service
+    - name: Deploy kibana service
       community.kubernetes.k8s:
         namespace: testing
         state: present
-        src: ./nginx/nginx-svc.yml
+        src: ./kibana/kibana_svc.yml
+
+    - name: Deploy counter pod
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ./test_counter/counter_po.yml

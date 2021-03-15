@@ -1,0 +1,62 @@
+---
+
+- name: Deploy backend apps
+  hosts: localhost
+  tasks:
+    - name: Fetch elasticsearch es_service status
+      set_fact:
+        es_service: "{{ lookup('community.kubernetes.k8s', kind='Service', namespace='testing', resource_name='elasticsearch') }}"
+
+    - name: Fetch elasticsearch statefulset status
+      set_fact:
+        es_sts: "{{ lookup('community.kubernetes.k8s', kind='StatefulSet', namespace='testing', resource_name='es-cluster') }}"
+    
+    - name: Delete elasticsearch statefulset if it exists
+      community.kubernetes.k8s:
+        namespace: testing
+        state: absent
+        kind: StatefulSet
+        name: es-cluster
+      when: es_sts.keys()| length > 0
+      ignore_errors: yes
+      
+    - name: Delete elasticsearch service if it exists
+      community.kubernetes.k8s:
+        namespace: testing
+        state: absent
+        kind: Service
+        name: elasticsearch
+      when: es_service.keys()| length > 0
+      ignore_errors: yes
+
+    - name: Deploy elasticsearch service
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ./elasticsearch/es_svc.yml
+
+    - name: Deploy elasticsearch elasticsearch statefulstate
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ./elasticsearch/es_sts.yml
+    
+    - name: Get fluentd status
+      set_fact:
+        fluentd_status: "{{ lookup('community.kubernetes.k8s', kind='DaemonSet', namespace='testing', resource_name='fluentd') }}"
+
+    - name: Delete fluentd DaemonSet if it exists
+      community.kubernetes.k8s:
+        namespace: testing
+        state: absent
+        kind: DaemonSet
+        name: fluentd
+      when: fluentd_status.keys()| length > 0
+      ignore_errors: yes
+
+    - name: Deploy fluentd DaemonSet
+      community.kubernetes.k8s:
+        namespace: testing
+        state: present
+        src: ../fluentd/fluentd_ds.yml
+

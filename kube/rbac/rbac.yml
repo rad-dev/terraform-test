@@ -1,0 +1,9 @@
+---
+
+- name: Role Based Access play
+  hosts: localhost
+  tasks:
+    - name: Apply role based access to EKS
+      community.kubernetes.k8s:
+        src: kube-role.yml
+        state: present
